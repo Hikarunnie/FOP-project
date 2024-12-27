@@ -7,7 +7,7 @@ public class SwiftInterpreter{
         SwiftInterpreter interpreter = new SwiftInterpreter();
         String input = """
                 var n = 5
-                var m = 10
+                var m = 10 + 5
                 var sum = n + m
                 print(sum)
                                      
