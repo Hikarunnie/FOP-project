@@ -2,18 +2,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class SwiftInterpreter{
+public class SwiftInterpreter {
     public static void main(String[] args) {
         SwiftInterpreter interpreter = new SwiftInterpreter();
         String input = """
                 var n = 5
                 var m = 10 + 5
-                var sum = n + m
+                var sum = n / m
                 print(sum)
-                                     
+                
                 """;
         interpreter.eval(input);
     }
+
     private final Map<String, Integer> variables = new HashMap<>();
 
 
@@ -28,11 +29,9 @@ public class SwiftInterpreter{
             }
             if (line.contains("=") && !line.startsWith("for")) {
                 handle_assignment(line);
-            }
-            else if (line.startsWith("print")) {
+            } else if (line.startsWith("print")) {
                 handle_print(line);
-            }
-            else {
+            } else {
                 throw new IllegalArgumentException("unrecognized statement: " + line);
             }
             index++;
@@ -47,6 +46,7 @@ public class SwiftInterpreter{
         int value = evaluate_expression(expression);
         variables.put(var_name, value);
     }
+
     private void handle_print(String line) {
         String var_name = line.substring(line.indexOf('(') + 1, line.indexOf(')')).trim();
         System.out.println(variables.getOrDefault(var_name, 0));
@@ -57,6 +57,22 @@ public class SwiftInterpreter{
         if (expression.contains("+")) {
             String[] parts = expression.split("\\+");
             return evaluate_expression(parts[0].trim()) + evaluate_expression(parts[1].trim());
+        }else if (expression.contains("-")) {
+            String[] parts = expression.split("\\-");
+            return evaluate_expression(parts[0].trim()) - evaluate_expression(parts[1].trim());
+        }else if (expression.contains("*")) {
+            String[] parts = expression.split("\\*");
+            return evaluate_expression(parts[0].trim()) * evaluate_expression(parts[1].trim());
+        }else if (expression.contains("/")) {
+            String[] parts = expression.split("\\/");
+            int denominator = evaluate_expression(parts[1].trim());
+            if (denominator == 0) {
+                throw new ArithmeticException("Division by zero");
+            }
+            return evaluate_expression(parts[0].trim()) / denominator;
+        } else if (expression.contains("%")) {
+            String[] parts = expression.split("\\%");
+            return evaluate_expression(parts[0].trim()) % evaluate_expression(parts[1].trim());
         }else {
             if (variables.containsKey(expression)) {
                 return variables.get(expression);
@@ -65,7 +81,6 @@ public class SwiftInterpreter{
             }
         }
     }
-
 }
 
 
