@@ -57,23 +57,24 @@ public class SwiftInterpreter {
         if (expression.contains("+")) {
             String[] parts = expression.split("\\+");
             return evaluate_expression(parts[0].trim()) + evaluate_expression(parts[1].trim());
-        }else if (expression.contains("-")) {
-            String[] parts = expression.split("\\-");
+        } else if (expression.contains("-")) {
+            String[] parts = expression.split("-");
             return evaluate_expression(parts[0].trim()) - evaluate_expression(parts[1].trim());
-        }else if (expression.contains("*")) {
+        } else if (expression.contains("*")) {
             String[] parts = expression.split("\\*");
             return evaluate_expression(parts[0].trim()) * evaluate_expression(parts[1].trim());
-        }else if (expression.contains("/")) {
-            String[] parts = expression.split("\\/");
+        } else if (expression.contains("/")) {
+            String[] parts = expression.split("/");
             int denominator = evaluate_expression(parts[1].trim());
             if (denominator == 0) {
                 throw new ArithmeticException("Division by zero");
             }
             return evaluate_expression(parts[0].trim()) / denominator;
         } else if (expression.contains("%")) {
-            String[] parts = expression.split("\\%");
+            String[] parts = expression.split("%");
             return evaluate_expression(parts[0].trim()) % evaluate_expression(parts[1].trim());
-        }else {
+        }
+        else {
             if (variables.containsKey(expression)) {
                 return variables.get(expression);
             } else {
