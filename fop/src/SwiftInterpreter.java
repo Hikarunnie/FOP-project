@@ -1,8 +1,8 @@
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class SwiftInterpreter {
+
     public static void main(String[] args) {
         SwiftInterpreter interpreter = new SwiftInterpreter();
         String input = """
@@ -22,7 +22,7 @@ public class SwiftInterpreter {
 
     private final Map<String, Integer> variables = new HashMap<>();
 
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void eval(String code) {
         String[] lines = code.split("\\r?\\n");
         int index = 0;
@@ -48,21 +48,41 @@ public class SwiftInterpreter {
             index++;
         }
     }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void handle_assignment(String line) {
-        line = line.replaceFirst("var ", "").trim();
-        String[] parts = line.split("=", 2);
-        String var_name = parts[0].trim();
-        String expression = parts[1].trim();
-        int value = evaluate_expression(expression);
-        variables.put(var_name, value);
-    }
+         line = line.replaceFirst("var ", "").trim(); // Remove "var" if present
+         String[] parts = line.split("=", 2);
+         String var_name = parts[0].trim();
+         String expression = parts[1].trim();
 
+          // in case of boolean
+         if (expression.equals("true")) {
+             variables.put(var_name,1);
+         }
+         else if (expression.equals("false")){
+             variables.put(var_name, 0);
+         }
+    // in case of a string
+         else if (expression.startsWith("\"") && expression.endsWith("\"")) {
+             String stringValue = expression.substring(1, expression.length() - 1); // Remove quotes
+             variables.put(var_name, stringValue.hashCode()); // Store strings as hashCodes (for simplicity)
+         }
+    // for  integer
+         else {
+             int value = evaluate_expression(expression);
+             variables.put(var_name, value);
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void handle_print(String line) {
         String var_name = line.substring(line.indexOf('(') + 1, line.indexOf(')')).trim();
         System.out.println(variables.getOrDefault(var_name, 0));
     }
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private int evaluate_expression(String expression) {
         if (expression.contains("+")) {
             String[] parts = expression.split("\\+");
@@ -92,9 +112,7 @@ public class SwiftInterpreter {
             }
         }
     }
-
-
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private boolean evaluate_condition(String condition) {
         if (condition.contains("<=")) {
             String[] parts = condition.split("<=");
@@ -119,7 +137,7 @@ public class SwiftInterpreter {
         }
     }
 
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private int handleWhileLoop (String [] lines, int index){
         String line = lines[index];
         String loop_head = line.substring(line.indexOf("while") + 5, line.indexOf("{")).trim();
