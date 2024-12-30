@@ -6,16 +6,13 @@ public class SwiftInterpreter {
     public static void main(String[] args) {
         SwiftInterpreter interpreter = new SwiftInterpreter();
         String input = """
-               var a = 48
-                var b = 18
-                while b != 0 {
-                var temp = b
-                var modulo = a % b
-                 b = modulo
-                 a = temp
-                 }
-                print(a)
-                             
+                var fact = 1
+                var n = 5
+                for i in 1...n {
+                    fact = fact * i
+                }
+                print(fact)
+                
                 """;
         interpreter.eval(input);
     }
@@ -41,6 +38,9 @@ public class SwiftInterpreter {
                 handle_print(line);
             } else if (line.startsWith("while")) {
                 index = handleWhileLoop(lines, index);
+            }
+            else if (line.startsWith("for")) {
+                index = handleForLoop(lines, index);
             }
             else {
                 throw new IllegalArgumentException("unrecognized statement: " + line);
@@ -136,8 +136,39 @@ public class SwiftInterpreter {
             throw new IllegalArgumentException("Unsupported condition: " + condition);
         }
     }
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    private int handleForLoop(String[] lines, int index) {
+        String line = lines[index];
+        String loop_head = line.substring(line.indexOf("for") + 3, line.indexOf("{")).trim();
+        String[] loop_parts = loop_head.split("in");
+        String loop_var = loop_parts[0].trim();
+        String range_expr = loop_parts[1].trim().replace("...", ","); // Handle Swift's `...`
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        String[] range_bound = range_expr.split(",");
+        int start = evaluate_expression(range_bound[0].trim());
+        int end = evaluate_expression(range_bound[1].trim());
+
+
+        // Collect loop body
+        int loop_start = index + 1;
+        StringBuilder loop_body = new StringBuilder();
+        while (++index < lines.length && lines[index].startsWith("    ")) {
+            loop_body.append(lines[index].trim()).append("\n");
+        }
+        index--;
+
+
+        // Execute loop
+        for (int i = start; i <= end; i++) {
+            variables.put(loop_var, i);
+            eval(loop_body.toString());
+        }
+        return index;
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private int handleWhileLoop (String [] lines, int index){
         String line = lines[index];
         String loop_head = line.substring(line.indexOf("while") + 5, line.indexOf("{")).trim();
@@ -169,6 +200,7 @@ public class SwiftInterpreter {
 
         return index; // Return the updated index
     }
+
 
 }
 
