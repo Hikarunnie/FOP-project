@@ -6,12 +6,7 @@ public class SwiftInterpreter {
     public static void main(String[] args) {
         SwiftInterpreter interpreter = new SwiftInterpreter();
         String input = """
-                var fact = 1
-                var n = 5
-                for i in 1...n {
-                    fact = fact * i
-                }
-                print(fact)
+                print ("Hello World!")
                 
                 """;
         interpreter.eval(input);
@@ -76,10 +71,17 @@ public class SwiftInterpreter {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private void handle_print(String line) {
-        String var_name = line.substring(line.indexOf('(') + 1, line.indexOf(')')).trim();
-        System.out.println(variables.getOrDefault(var_name, 0));
+private void handle_print(String line) {
+    String content = line.substring(line.indexOf('(') + 1, line.lastIndexOf(')')).trim();
+    // printing string
+    if (content.startsWith("\"") && content.endsWith("\"")) {
+        System.out.println(content.substring(1, content.length() - 1));
+    } else {
+        // printing variables
+        int value = evaluate_expression(content);
+        System.out.println(value);
     }
+}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
