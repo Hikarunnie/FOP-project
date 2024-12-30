@@ -6,15 +6,17 @@ public class SwiftInterpreter {
     public static void main(String[] args) {
         SwiftInterpreter interpreter = new SwiftInterpreter();
         String input = """
-    var num = 23
-    var sum = 0
-    while num > 0 {
-        var digit = num % 10
-        sum = sum + digit
-        num = num / 10
-    }
-    print(sum)
-""";
+               var a = 48
+                var b = 18
+                while b != 0 {
+                var temp = b
+                var modulo = a % b
+                 b = modulo
+                 a = temp
+                 }
+                print(a)
+                             
+                """;
         interpreter.eval(input);
     }
 
@@ -30,7 +32,10 @@ public class SwiftInterpreter {
                 index++;
                 continue;
             }
-            if (line.contains("=") && !line.startsWith("for")) {
+            if (line.endsWith("{")) {
+                line = line.substring(0, line.length() - 1).trim();
+            }
+            if (line.contains("=") && !line.startsWith("for") && !line.startsWith("while")) {
                 handle_assignment(line);
             } else if (line.startsWith("print")) {
                 handle_print(line);
