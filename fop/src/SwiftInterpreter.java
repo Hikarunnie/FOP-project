@@ -6,8 +6,25 @@ public class SwiftInterpreter {
     public static void main(String[] args) {
         SwiftInterpreter interpreter = new SwiftInterpreter();
         String input = """
-                print ("Hello World!")
-                
+                var n = 10
+                var a = 0
+                var b = 1
+                var fib = 0
+                if n == 1 {
+                  fib = a         
+                }
+                if n == 2 {
+                  fib = b     
+                }
+                else {
+                  for i in 3...n {
+                      fib = a + b
+                      a = b
+                      b = fib
+                  }
+                }
+                print(fib)
+                                
                 """;
         interpreter.eval(input);
     }
@@ -27,14 +44,15 @@ public class SwiftInterpreter {
             if (line.endsWith("{")) {
                 line = line.substring(0, line.length() - 1).trim();
             }
-            if (line.contains("=") && !line.startsWith("for") && !line.startsWith("while")) {
+            if (line.contains("=") && !line.startsWith("for") && !line.startsWith("while") && !line.startsWith("if"))  {
                 handle_assignment(line);
-            } else if (line.startsWith("print")) {
+            }else if (line.startsWith("print")) {
                 handle_print(line);
+            } else if (line.startsWith("if")) {
+                index = handle_if_else(lines, index);
             } else if (line.startsWith("while")) {
                 index = handleWhileLoop(lines, index);
-            }
-            else if (line.startsWith("for")) {
+            } else if (line.startsWith("for")) {
                 index = handleForLoop(lines, index);
             }
             else {
@@ -45,23 +63,24 @@ public class SwiftInterpreter {
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // handling variable assignment
     private void handle_assignment(String line) {
          line = line.replaceFirst("var ", "").trim(); // Remove "var" if present
          String[] parts = line.split("=", 2);
          String var_name = parts[0].trim();
          String expression = parts[1].trim();
 
-          // in case of boolean
+          // for boolean
          if (expression.equals("true")) {
              variables.put(var_name,1);
          }
          else if (expression.equals("false")){
              variables.put(var_name, 0);
          }
-    // in case of a string
+    // for string
          else if (expression.startsWith("\"") && expression.endsWith("\"")) {
-             String stringValue = expression.substring(1, expression.length() - 1); // Remove quotes
-             variables.put(var_name, stringValue.hashCode()); // Store strings as hashCodes (for simplicity)
+             String stringValue = expression.substring(1, expression.length() - 1);
+             variables.put(var_name, stringValue.hashCode()); // Store strings as hashCodes
          }
     // for  integer
          else {
@@ -71,18 +90,18 @@ public class SwiftInterpreter {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-private void handle_print(String line) {
+
+    private void handle_print(String line) {
     String content = line.substring(line.indexOf('(') + 1, line.lastIndexOf(')')).trim();
-    // printing string
+    //for string
     if (content.startsWith("\"") && content.endsWith("\"")) {
         System.out.println(content.substring(1, content.length() - 1));
     } else {
-        // printing variables
+    // for integer
         int value = evaluate_expression(content);
         System.out.println(value);
     }
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private int evaluate_expression(String expression) {
@@ -138,7 +157,86 @@ private void handle_print(String line) {
             throw new IllegalArgumentException("Unsupported condition: " + condition);
         }
     }
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //handling if-else
+    private int handle_if_else(String[] lines, int index) {
+        String if_line = lines[index].trim();
+        String condition = if_line.substring(if_line.indexOf("if") + 2, if_line.indexOf("{")).trim();
+        boolean condition_result = evaluate_condition(condition);
+
+        index++;
+        int if_end = find_matching_braces(lines, index);
+
+        int elseif_start = if_end + 1;
+        int elseif_end = -1;
+
+
+        while (elseif_start < lines.length && lines[elseif_start].trim().startsWith("else if")) {
+            String elseif_condition = lines[elseif_start].trim().substring("else if".length()).trim();
+            if (evaluate_condition(elseif_condition)) {
+                elseif_end = find_matching_braces(lines, elseif_start + 1);
+                interpret_block(lines, elseif_start + 1, elseif_end);
+                return elseif_end;
+            }
+            elseif_start = find_matching_braces(lines, elseif_start + 1) + 1;
+        }
+
+        int else_start = elseif_start;
+        int else_end = -1;
+
+
+        if (else_start < lines.length && lines[else_start].trim().startsWith("else")) {
+            else_end = find_matching_braces(lines, else_start + 1);
+            if (!condition_result) {
+                interpret_block(lines, else_start + 1, else_end);
+                return else_end;
+            }
+        }
+
+        if (condition_result) {
+            interpret_block(lines, index, if_end);
+        }
+        return Math.max(if_end, Math.max(elseif_end, else_end));
+    }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // necessary helper methods for if-else
+    private int find_matching_braces(String[] lines, int startIndex) {
+        int braceCount = 1;
+        int index = startIndex;
+        while (index < lines.length) {
+            String line = lines[index].trim();
+            if (line.contains("{")) {
+                braceCount++;
+            }
+            if (line.contains("}")) {
+                braceCount--;
+                if (braceCount == 0) {
+                    return index;
+                }
+            }
+            index++;
+        }
+        throw new IllegalArgumentException("Unmatched brace");
+    }
+///////////////////////////
+    private void interpret_block(String[] lines, int startIndex, int endIndex) {
+        for (int i = startIndex; i <= endIndex; i++) {
+            String line = lines[i].trim();
+            if (line.contains("=") && !line.startsWith("for") && !line.startsWith("if") && !line.startsWith("while")) {
+                handle_assignment(line);
+            } else if (line.startsWith("if")) {
+                i = handle_if_else(lines, i);
+            } else if (line.startsWith("for")) {
+                i = handleForLoop(lines, i);
+            } else if (line.startsWith("print")) {
+                handle_print(line);
+            }
+        }
+    }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
     private int handleForLoop(String[] lines, int index) {
         String line = lines[index];
         String loop_head = line.substring(line.indexOf("for") + 3, line.indexOf("{")).trim();
@@ -152,7 +250,6 @@ private void handle_print(String line) {
         int end = evaluate_expression(range_bound[1].trim());
 
 
-        // Collect loop body
         int loop_start = index + 1;
         StringBuilder loop_body = new StringBuilder();
         while (++index < lines.length && lines[index].startsWith("    ")) {
@@ -161,7 +258,6 @@ private void handle_print(String line) {
         index--;
 
 
-        // Execute loop
         for (int i = start; i <= end; i++) {
             variables.put(loop_var, i);
             eval(loop_body.toString());
@@ -177,7 +273,7 @@ private void handle_print(String line) {
 
 
         StringBuilder loop_body = new StringBuilder();
-        int braceCount = 1; // Count opening and closing braces
+        int braceCount = 1;
         for (index = index + 1; index < lines.length; index++) {
             String currentLine = lines[index].trim();
 
@@ -195,15 +291,12 @@ private void handle_print(String line) {
             loop_body.append(currentLine).append("\n");
         }
 
-        // Execute the loop while the condition is true
         while (evaluate_condition(loop_head)) {
             eval(loop_body.toString());
         }
 
-        return index; // Return the updated index
+        return index;
     }
-
-
 }
 
 
