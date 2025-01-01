@@ -2,36 +2,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SwiftInterpreter {
-
-    public static void main(String[] args) {
-        SwiftInterpreter interpreter = new SwiftInterpreter();
-        String input = """
-                var n = 10
-                var a = 0
-                var b = 1
-                var fib = 0
-                if n == 1 {
-                  fib = a         
-                }
-                if n == 2 {
-                  fib = b     
-                }
-                else {
-                  for i in 3...n {
-                      fib = a + b
-                      a = b
-                      b = fib
-                  }
-                }
-                print(fib)
-                                
-                """;
-        interpreter.eval(input);
-    }
-
     private final Map<String, Integer> variables = new HashMap<>();
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public void eval(String code) {
         String[] lines = code.split("\\r?\\n");
         int index = 0;
@@ -62,7 +33,6 @@ public class SwiftInterpreter {
         }
     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     // handling variable assignment
     private void handle_assignment(String line) {
          line = line.replaceFirst("var ", "").trim(); // Remove "var" if present
@@ -90,7 +60,6 @@ public class SwiftInterpreter {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     private void handle_print(String line) {
     String content = line.substring(line.indexOf('(') + 1, line.lastIndexOf(')')).trim();
     //for string
@@ -102,7 +71,6 @@ public class SwiftInterpreter {
         System.out.println(value);
     }
 }
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private int evaluate_expression(String expression) {
         if (expression.contains("+")) {
@@ -198,8 +166,6 @@ public class SwiftInterpreter {
         }
         return Math.max(if_end, Math.max(elseif_end, else_end));
     }
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // necessary helper methods for if-else
     private int find_matching_braces(String[] lines, int startIndex) {
@@ -235,7 +201,6 @@ public class SwiftInterpreter {
             }
         }
     }
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
     private int handleForLoop(String[] lines, int index) {
         String line = lines[index];
@@ -264,8 +229,6 @@ public class SwiftInterpreter {
         }
         return index;
     }
-
-
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private int handleWhileLoop (String [] lines, int index){
         String line = lines[index];
@@ -297,6 +260,228 @@ public class SwiftInterpreter {
 
         return index;
     }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// Tested and proven to work with all algorithms
+// Here are all algorithms in swift code for you to test as well ( + 1 additional just for fun :)) ):
+
+
+    public static void main(String[] args) {
+        SwiftInterpreter interpreter = new SwiftInterpreter();
+// 1. Sum of First N Numbers ✔
+//  Input: n = 10
+//  Output: 55
+
+        String input = """
+                var sum = 0
+                var n = 10
+                for i in 1...n {
+                    sum = sum + i
+                }
+                print(sum)
+
+                                """;
+
+
+//2. Factorial of N ✔
+//  Input: n = 5
+//  Output: 120
+
+//           String input = """
+//                   var fact = 1
+//                   var n = 5
+//                   for i in 1...n {
+//                       fact = fact * i
+//                   }
+//                   print(fact)
+//
+//                   """;
+
+
+//3. GCD of Two Numbers  ✔
+//  Input: a = 48, b = 18
+//  Output: 6
+
+//        String input = """
+//                var a = 48
+//                var b = 18
+//                while b != 0 {
+//                    var temp = b
+//                    var modulo = a % b
+//                    b = modulo
+//                    a = temp
+//                }
+//                print(a)
+//
+//                   """;
+
+
+//4. Reverse a Number  ✔
+//  Input: 1234
+//  Output: 4321
+
+//        String input = """
+//                var num = 1234
+//                var reversed = 0
+//                while num > 0 {
+//                    var digit = num % 10
+//                    reversed = reversed * 10 + digit
+//                    num = num / 10
+//                }
+//                print(reversed)
+//
+//                   """;
+
+
+//5. Check if a Number is Prime ✔
+//  Input: n = 13
+//  Output: True ( 1 for true in our case, 0 - false)
+
+//        String input = """
+//                var n = 13
+//                var isPrime = true
+//                if n <= 1 {
+//                   isPrime = false
+//                }
+//                else {
+//                   for i in 2...n-1 {
+//                       if n % i == 0 {
+//                           isPrime = false
+//                           break
+//                       }
+//                   }
+//                }
+//                print(isPrime)
+//                   """;
+
+
+//6. Check if a Number is Palindrome ✔
+//  Input: 121
+//  Output: True
+
+//        String input = """
+//                var num = 112211
+//                var orig = num
+//                var reversed = 0
+//                while num > 0 {
+//                     var digit = num % 10
+//                     reversed = reversed * 10 + digit
+//                     num = num / 10
+//                }
+//                if reversed == orig {
+//                       print("true")
+//                }
+//                else{
+//                       print("false")
+//                }
+//
+//                   """;
+
+
+//7. Find the Largest Digit in a Number ✔
+//  Input: n = 3947
+//  Output: 9
+
+//        String input = """
+//                var n = 3947
+//                var largest = 0
+//                while n > 0 {
+//                    var digit = n % 10
+//                    if digit > largest {
+//                        largest = digit
+//                    }
+//                    n = n / 10
+//                }
+//                print(largest)
+//                   """;
+
+
+//8. Sum of Digits ✔
+//  Input: 1234
+//  Output: 10
+
+//        String input = """
+//                var num = 1234
+//                var sum = 0
+//                while num > 0 {
+//                    var digit = num % 10
+//                    sum = sum + digit
+//                    num = num / 10
+//                }
+//                print(sum)
+//
+//                   """;
+
+
+//9. Multiplication Table ✔
+//  Input: 5
+//  Output:
+//          5
+//          10
+//          15
+//          20
+//          25
+//          30
+//          35
+//          40
+//          45
+//          50
+
+//        String input = """
+//                var num = 5
+//                for i in 1...10 {
+//                    var product = num * i
+//                    print(product)
+//                }
+//                   """;
+
+
+//10. Nth Fibonacci Number ✔
+//  Input:n = 10
+//  Output: 34
+
+//        String input = """
+//                var n = 10
+//                var a = 0
+//                var b = 1
+//                var fib = 0
+//                if n == 1 {
+//                  fib = a
+//                }
+//                if n == 2 {
+//                  fib = b
+//                }
+//                else {
+//                  for i in 3...n {
+//                      fib = a + b
+//                      a = b
+//                      b = fib
+//                  }
+//                }
+//                print(fib)
+//                   """;
+
+// 11.additional algorithm to test:  Checking if first n numbers are odd or even:
+
+//        String input = """
+//                var n = 10
+//                for number in 1...n {
+//                    if number % 2 == 0 {
+//                        print(number )
+//                        print("is even")
+//                    }
+//                    else {
+//                         print(number)
+//                         print("is odd")
+//                    }
+//                }
+//                """;
+
+        interpreter.eval(input);
+    }
+
+
 }
 
 
