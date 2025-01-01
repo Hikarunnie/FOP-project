@@ -1,0 +1,72 @@
+SWIFT INTERPRETER IN JAVA
+–----------------------------------------------------------------------------------------------------------------------------–----------------------------------------------------------------------------------------------------------------------------
+Our task was to design and implement a simple interpreter for a programming language swift.
+Our project focuses on supporting a minimal subset of the language, including essential features such as arithmetic operations (+, -, *, /, %) which is handled in our method evaluate_expression that focuses on all arithmetic operations. 
+
+ Entry point for interpreting the entire Swift-like script is the eval method. It processes each line of code, determines its type, and calls the appropriate handler methods. It takes a multi-line string representing a Swift-like script and splits the code into individual lines, Iterates through the lines and processes each one according to its syntax (assignment, print, conditionals, loops). If an unrecognized statement is encountered, it throws an IllegalArgumentException.
+
+Handle_assigment method handles variable declaration and assignment operations within the script. The result is stored in the variables map, which holds the current values of all declared variables.
+
+handle_print method is used to output the result of expressions or string literals to the console.
+ Directly prints the result to the console using System.out.println
+
+handle_if_else processes if, else if and else conditions and executes the corresponding blocks based on the evaluated condition. It takes the line of code starting with if statement
+ Extracts and evaluates the condition from the if statement.
+If the condition is true, it processes the block following the if.
+If there are else if statements, it evaluates their conditions in order, executing the first matching block. If none of the conditions match and there's an else, it executes the block following else.
+Helper method we used is find_matching_braces
+
+find_matching_braces identifies the end of blocks, as conditions and loops in Swift-like syntax are enclosed in braces {}.  It counts the braces and ensures that an opening brace { matches with the closing brace }
+
+Another helper method we used was interpret_block and the purpose of it is to iterate over each line within the block and process it according to the statement type (assignment, print, condition, or loop).
+
+
+handleWhileLoop handles while loops by evaluating the loop condition at the start of each iteration and executing the loop body as long as the condition is true. It extracts and evaluates the loop condition and repeatedly evaluates the loop body as long as the condition remains true.
+It calls eval recursively to execute the loop body for each iteration.
+
+
+hanleForLoop handles for loops by iterating over a specified range. Takes the for loop header ( for i in 1…10), extracts the loop variable and range (e.g. 1…10), then evaluates range’s start and end values, loops through the specified range and assigns the loop variable (i) to each value in the range.
+Executes the loop body using eval.
+
+evaluate_condition evaluates conditions used in if, while and for statements by identifying the operator in the condition (<=, >=, ==, !=, <, >), splits the condition around the operator and recursively evaluates both sides. In the end it returns a boolean value indicating whether the condition is true or false. 
+
+
+–----------------------------------------------------------------------------------------------------------------------------–----------------------------------------------------------------------------------------------------------------------------
+Example of usage: 
+–----------------------------------------------------------------------------------------------------------------------------–----------------------------------------------------------------------------------------------------------------------------
+Let’s take Swift code of finding the largest digit in the number and analyze how interpreter interprets it 
+
+
+
+       var n = 3947
+       var largest = 0
+       while n > 0 {
+           var digit = n % 10
+           if digit > largest {
+               largest = digit
+           }
+           n = n / 10
+       }
+       print(largest)
+
+
+
+var n = 3947
+var largest = 0 
+The interpreter uses the handle_assignment method to process these lines. It extracts variable names (n, largest) and assigns the respective values, storing them in a variables map for later use.
+
+WhileLoop Execution:
+The while n > 0 statement is a loop that processes the digits of n until all digits are evaluated.
+
+The interpreter uses the handleWhileLoop method:
+Step 1: It evaluates the condition n > 0 using the evaluate_condition method. This method splits the condition into its components (n and 0), evaluates their values, and applies the > operator.
+Step 2: If the condition is true, the interpreter processes the loop body using the interpret_block method, which executes each line of the block in sequence.
+
+Loop Body Execution: Inside the loop, the following steps occur during each iteration:
+var digit = n % 10: The remainder operation (%) extracts the last digit of n. The evaluate_expression method performs this arithmetic operation and assigns the result to digit using handle_assignment.
+if digit > largest: The handle_if_else method evaluates the condition (digit > largest) using evaluate_condition. If the condition is true, it updates the value of largest using handle_assignment.
+n = n / 10: This performs integer division (/) to remove the last digit of n. The updated value of n is assigned back to the variable using handle_assignment.
+
+Printing the Result:
+After the loop terminates, the print(largest) statement is executed using the handle_print method.
+The handle_print method evaluates the value of largest and outputs it to the console using System.out.println.
